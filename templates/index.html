@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Job Posting Detector</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Fake Job Posting Detector</h1>
+
+        <p class="subtitle">
+            Analyze job descriptions and identify potentially fraudulent job postings using Machine Learning.
+        </p>
+
+        <form action="/predict" method="POST">
+
+            <label for="job_description">Job Description</label>
+
+<textarea
+    id="job_description"
+    name="job_description"
+    rows="10"
+    placeholder="Paste the complete job description here..."
+    oninput="document.getElementById('charCount').textContent = this.value.length + ' characters'"
+    required></textarea>
+
+<p id="charCount">0 characters</p>
+
+            <button type="submit">Analyze Job Posting</button>
+            <button type="reset" class="clear-button">Clear</button>
+        </form>
+
+{% if error %}
+<div class="error-message">
+    {{error}}
+</div>
+{% endif %}
+{% if prediction %}
+<div class="result {% if 'Fraudulent' in prediction %}fraudulent{% else %}genuine{% endif %}">
+
+    {% if 'Fraudulent' in prediction %}
+        <div class="result-icon">⚠️</div>
+        <h2>Potentially Fraudulent Job</h2>
+        <p>This job posting contains patterns associated with fraudulent listings. Proceed with caution.</p>
+    {% else %}
+        <div class="result-icon">🛡️</div>
+        <h2>Genuine-Looking Job Posting</h2>
+        <p>Our model classified this job posting as genuine. Always verify the employer before applying.</p>
+    {% endif %}
+
+    <p class="confidence">Model confidence: {{ confidence }}%</p>
+
+    <div class="confidence-bar">
+        <div class="confidence-fill"
+             style="width: {{ confidence | int }}%;">
+        </div>
+    </div>
+
+</div>
+{% endif %}
+    </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const textarea = document.getElementById("job_description");
+        const counter = document.getElementById("charCount");
+
+        textarea.addEventListener("input", function() {
+            const count = textarea.value.length;
+            counter.textContent = count + " characters";
+        });
+
+    });
+</script>
+</body>
+</html>
